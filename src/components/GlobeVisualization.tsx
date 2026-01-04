@@ -12,7 +12,7 @@ interface GlobeVisualizationProps {
 export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: GlobeVisualizationProps) {
   const globeEl = useRef<any>();
   const [countries, setCountries] = useState<any>({ features: [] });
-  const [hoverD, setHoverD] = useState<any>(null);
+  const [_, setHoverD] = useState<any>(null);
 
   useEffect(() => {
     // Load country data

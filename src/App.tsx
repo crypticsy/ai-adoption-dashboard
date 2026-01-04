@@ -26,11 +26,6 @@ function App() {
     return precomputedData?.availableYears || [];
   }, [precomputedData]);
 
-  // Calculate total count of daily active users
-  const totalActiveUsers = useMemo(() => {
-    return filteredData.reduce((sum, item) => sum + item.daily_active_users, 0);
-  }, [filteredData]);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center">
