@@ -7,10 +7,13 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ data }: TrendChartProps) {
+  // Calculate total users across all years
+  const totalUsers = data.reduce((sum, item) => sum + item.totalUsers, 0);
+
   const chartData = data.map(item => ({
     year: item.year.toString(),
     adoption: item.averageAdoption,
-    users: item.totalUsers / 1000000, // Convert to millions
+    users: totalUsers > 0 ? (item.totalUsers / totalUsers) * 100 : 0, // Percentage of total
   }));
 
   return (
@@ -52,7 +55,7 @@ export function TrendChart({ data }: TrendChartProps) {
             orientation="right"
             stroke="#94a3b8"
             tick={{ fill: '#94a3b8' }}
-            label={{ value: 'Users (M)', angle: 90, position: 'insideRight', fill: '#94a3b8' }}
+            label={{ value: 'Users (%)', angle: 90, position: 'insideRight', fill: '#94a3b8' }}
           />
           <Tooltip
             contentStyle={{
@@ -63,7 +66,7 @@ export function TrendChart({ data }: TrendChartProps) {
             }}
             formatter={(value: number, name: string) => {
               if (name === 'adoption') return [`${value.toFixed(1)}%`, 'Adoption Rate'];
-              if (name === 'users') return [`${value.toFixed(2)}M`, 'Total Users'];
+              if (name === 'users') return [`${value.toFixed(2)}%`, 'Users % of Total'];
               return [value, name];
             }}
           />
@@ -71,7 +74,7 @@ export function TrendChart({ data }: TrendChartProps) {
             wrapperStyle={{ color: '#94a3b8' }}
             formatter={(value) => {
               if (value === 'adoption') return 'Adoption Rate';
-              if (value === 'users') return 'Total Users';
+              if (value === 'users') return 'Users % of Total';
               return value;
             }}
           />

@@ -41,10 +41,12 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
     });
   });
 
+  const totalIndustryUsers = Array.from(industryMap.values()).reduce((sum, data) => sum + data.users, 0);
   const industryData = Array.from(industryMap.entries())
     .map(([name, data]) => ({
       name,
       users: data.users,
+      usersPercent: totalIndustryUsers > 0 ? (data.users / totalIndustryUsers) * 100 : 0,
       adoption: (data.adoption / data.count).toFixed(1),
     }))
     .sort((a, b) => b.users - a.users)
@@ -91,6 +93,28 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
       const order = ['Startup', 'SME', 'Enterprise'];
       return order.indexOf(a.name) - order.indexOf(b.name);
     });
+
+  // Aggregate by age group
+  const ageMap = new Map<string, { users: number; adoption: number; count: number }>();
+  countryData.forEach(d => {
+    const existing = ageMap.get(d.age_group) || { users: 0, adoption: 0, count: 0 };
+    ageMap.set(d.age_group, {
+      users: existing.users + d.daily_active_users,
+      adoption: existing.adoption + d.adoption_rate,
+      count: existing.count + 1,
+    });
+  });
+
+  const ageOrder = ['18-24', '25-34', '35-44', '45-54', '55+'];
+  const totalAgeUsers = Array.from(ageMap.values()).reduce((sum, data) => sum + data.users, 0);
+  const ageData = Array.from(ageMap.entries())
+    .map(([name, data]) => ({
+      name,
+      users: data.users,
+      usersPercent: totalAgeUsers > 0 ? (data.users / totalAgeUsers) * 100 : 0,
+      adoption: (data.adoption / data.count).toFixed(1),
+    }))
+    .sort((a, b) => ageOrder.indexOf(a.name) - ageOrder.indexOf(b.name));
 
   // Calculate totals for this filtered data
   const totalUsers = countryData.reduce((sum, d) => sum + d.daily_active_users, 0);
@@ -139,7 +163,7 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
             >
               <div className="flex items-center gap-2 mb-2">
                 <Users className="text-[#e5c07b]" size={20} />
-                <span className="text-[#abb2bf] text-sm">Total Users</span>
+                <span className="text-[#abb2bf] text-sm">Total Data Points</span>
               </div>
               <div className="text-2xl font-bold text-[#e5c07b]">
                 {totalUsers.toLocaleString()}
@@ -239,7 +263,7 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                 <BarChart data={industryData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#323437" />
                   <XAxis dataKey="name" stroke="#abb2bf" tick={{ fill: '#abb2bf', fontSize: 11 }} angle={-45} textAnchor="end" height={80} />
-                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} />
+                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users (% of Total)', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1a1a1a',
@@ -247,8 +271,12 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                       borderRadius: '8px',
                       color: '#abb2bf',
                     }}
+                    formatter={(value: number, name: string) => {
+                      if (name === 'usersPercent') return [`${value.toFixed(2)}%`, 'Users % of Total'];
+                      return [value, name];
+                    }}
                   />
-                  <Bar dataKey="users" radius={[8, 8, 0, 0]}>
+                  <Bar dataKey="usersPercent" radius={[8, 8, 0, 0]}>
                     {industryData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -330,6 +358,52 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                     </div>
                   );
                 })}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Age Group Analytics */}
+          {ageData.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="bg-[#1a1a1a] border border-[#323437] rounded-lg p-6"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="text-[#e5c07b]" size={20} />
+                <h3 className="text-lg font-semibold text-[#e5c07b]">Age Group Analytics</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={ageData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#323437" />
+                  <XAxis dataKey="name" stroke="#abb2bf" tick={{ fill: '#abb2bf' }} />
+                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users (% of Total)', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #323437',
+                      borderRadius: '8px',
+                      color: '#abb2bf',
+                    }}
+                    formatter={(value: number, name: string) => {
+                      if (name === 'usersPercent') return [`${value.toFixed(2)}%`, 'Users % of Total'];
+                      return [value, name];
+                    }}
+                  />
+                  <Bar dataKey="usersPercent" fill="#61afef" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 space-y-2">
+                {ageData.map(item => (
+                  <div key={item.name} className="flex items-center justify-between text-sm">
+                    <span className="text-[#abb2bf]">{item.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#61afef] font-semibold">{item.users.toLocaleString()} users</span>
+                      <span className="text-[#98c379]">{item.adoption}% adoption</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}

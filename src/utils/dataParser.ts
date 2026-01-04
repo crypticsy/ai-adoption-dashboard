@@ -1,5 +1,15 @@
 import Papa from 'papaparse';
-import type { AIAdoptionData, CountryData, IndustryData, ToolData, TrendData, AgeGroupData, CompanySizeData, DashboardStats } from '../types';
+import type { AIAdoptionData, CountryData, IndustryData, ToolData, TrendData, AgeGroupData, CompanySizeData, DashboardStats, PrecomputedData } from '../types';
+
+// Helper function to calculate median
+function calculateMedian(numbers: number[]): number {
+  if (numbers.length === 0) return 0;
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
 
 // Country coordinates for globe visualization
 const countryCoordinates: Record<string, { lat: number; lng: number }> = {
@@ -43,12 +53,12 @@ export async function parseCSVData(filePath: string): Promise<AIAdoptionData[]> 
 }
 
 export function aggregateByCountry(data: AIAdoptionData[]): CountryData[] {
-  const countryMap = new Map<string, { totalUsers: number; totalAdoption: number; count: number }>();
+  const countryMap = new Map<string, { userValues: number[]; totalAdoption: number; count: number }>();
 
   data.forEach((row) => {
-    const existing = countryMap.get(row.country) || { totalUsers: 0, totalAdoption: 0, count: 0 };
+    const existing = countryMap.get(row.country) || { userValues: [], totalAdoption: 0, count: 0 };
     countryMap.set(row.country, {
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       totalAdoption: existing.totalAdoption + row.adoption_rate,
       count: existing.count + 1,
     });
@@ -56,7 +66,7 @@ export function aggregateByCountry(data: AIAdoptionData[]): CountryData[] {
 
   return Array.from(countryMap.entries()).map(([country, stats]) => ({
     country,
-    totalUsers: stats.totalUsers,
+    totalUsers: calculateMedian(stats.userValues),
     averageAdoption: stats.totalAdoption / stats.count,
     count: stats.count,
     lat: countryCoordinates[country]?.lat || 0,
@@ -65,12 +75,12 @@ export function aggregateByCountry(data: AIAdoptionData[]): CountryData[] {
 }
 
 export function aggregateByIndustry(data: AIAdoptionData[]): IndustryData[] {
-  const industryMap = new Map<string, { totalUsers: number; totalAdoption: number; count: number }>();
+  const industryMap = new Map<string, { userValues: number[]; totalAdoption: number; count: number }>();
 
   data.forEach((row) => {
-    const existing = industryMap.get(row.industry) || { totalUsers: 0, totalAdoption: 0, count: 0 };
+    const existing = industryMap.get(row.industry) || { userValues: [], totalAdoption: 0, count: 0 };
     industryMap.set(row.industry, {
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       totalAdoption: existing.totalAdoption + row.adoption_rate,
       count: existing.count + 1,
     });
@@ -79,7 +89,7 @@ export function aggregateByIndustry(data: AIAdoptionData[]): IndustryData[] {
   return Array.from(industryMap.entries())
     .map(([industry, stats]) => ({
       industry,
-      totalUsers: stats.totalUsers,
+      totalUsers: calculateMedian(stats.userValues),
       averageAdoption: stats.totalAdoption / stats.count,
       count: stats.count,
     }))
@@ -87,12 +97,12 @@ export function aggregateByIndustry(data: AIAdoptionData[]): IndustryData[] {
 }
 
 export function aggregateByTool(data: AIAdoptionData[]): ToolData[] {
-  const toolMap = new Map<string, { totalUsers: number; totalAdoption: number; count: number }>();
+  const toolMap = new Map<string, { userValues: number[]; totalAdoption: number; count: number }>();
 
   data.forEach((row) => {
-    const existing = toolMap.get(row.ai_tool) || { totalUsers: 0, totalAdoption: 0, count: 0 };
+    const existing = toolMap.get(row.ai_tool) || { userValues: [], totalAdoption: 0, count: 0 };
     toolMap.set(row.ai_tool, {
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       totalAdoption: existing.totalAdoption + row.adoption_rate,
       count: existing.count + 1,
     });
@@ -101,7 +111,7 @@ export function aggregateByTool(data: AIAdoptionData[]): ToolData[] {
   return Array.from(toolMap.entries())
     .map(([tool, stats]) => ({
       tool,
-      totalUsers: stats.totalUsers,
+      totalUsers: calculateMedian(stats.userValues),
       averageAdoption: stats.totalAdoption / stats.count,
       count: stats.count,
     }))
@@ -109,13 +119,13 @@ export function aggregateByTool(data: AIAdoptionData[]): ToolData[] {
 }
 
 export function aggregateByYear(data: AIAdoptionData[]): TrendData[] {
-  const yearMap = new Map<number, { totalAdoption: number; totalUsers: number; count: number }>();
+  const yearMap = new Map<number, { totalAdoption: number; userValues: number[]; count: number }>();
 
   data.forEach((row) => {
-    const existing = yearMap.get(row.year) || { totalAdoption: 0, totalUsers: 0, count: 0 };
+    const existing = yearMap.get(row.year) || { totalAdoption: 0, userValues: [], count: 0 };
     yearMap.set(row.year, {
       totalAdoption: existing.totalAdoption + row.adoption_rate,
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       count: existing.count + 1,
     });
   });
@@ -124,18 +134,18 @@ export function aggregateByYear(data: AIAdoptionData[]): TrendData[] {
     .map(([year, stats]) => ({
       year,
       averageAdoption: stats.totalAdoption / stats.count,
-      totalUsers: stats.totalUsers,
+      totalUsers: calculateMedian(stats.userValues),
     }))
     .sort((a, b) => a.year - b.year);
 }
 
 export function aggregateByAgeGroup(data: AIAdoptionData[]): AgeGroupData[] {
-  const ageMap = new Map<string, { totalUsers: number; totalAdoption: number; count: number }>();
+  const ageMap = new Map<string, { userValues: number[]; totalAdoption: number; count: number }>();
 
   data.forEach((row) => {
-    const existing = ageMap.get(row.age_group) || { totalUsers: 0, totalAdoption: 0, count: 0 };
+    const existing = ageMap.get(row.age_group) || { userValues: [], totalAdoption: 0, count: 0 };
     ageMap.set(row.age_group, {
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       totalAdoption: existing.totalAdoption + row.adoption_rate,
       count: existing.count + 1,
     });
@@ -146,19 +156,19 @@ export function aggregateByAgeGroup(data: AIAdoptionData[]): AgeGroupData[] {
   return Array.from(ageMap.entries())
     .map(([ageGroup, stats]) => ({
       ageGroup,
-      totalUsers: stats.totalUsers,
+      totalUsers: calculateMedian(stats.userValues),
       averageAdoption: stats.totalAdoption / stats.count,
     }))
     .sort((a, b) => ageOrder.indexOf(a.ageGroup) - ageOrder.indexOf(b.ageGroup));
 }
 
 export function aggregateByCompanySize(data: AIAdoptionData[]): CompanySizeData[] {
-  const sizeMap = new Map<string, { totalUsers: number; totalAdoption: number; count: number }>();
+  const sizeMap = new Map<string, { userValues: number[]; totalAdoption: number; count: number }>();
 
   data.forEach((row) => {
-    const existing = sizeMap.get(row.company_size) || { totalUsers: 0, totalAdoption: 0, count: 0 };
+    const existing = sizeMap.get(row.company_size) || { userValues: [], totalAdoption: 0, count: 0 };
     sizeMap.set(row.company_size, {
-      totalUsers: existing.totalUsers + row.daily_active_users,
+      userValues: [...existing.userValues, row.daily_active_users],
       totalAdoption: existing.totalAdoption + row.adoption_rate,
       count: existing.count + 1,
     });
@@ -169,14 +179,15 @@ export function aggregateByCompanySize(data: AIAdoptionData[]): CompanySizeData[
   return Array.from(sizeMap.entries())
     .map(([size, stats]) => ({
       size,
-      totalUsers: stats.totalUsers,
+      totalUsers: calculateMedian(stats.userValues),
       averageAdoption: stats.totalAdoption / stats.count,
     }))
     .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size));
 }
 
 export function calculateDashboardStats(data: AIAdoptionData[]): DashboardStats {
-  const totalUsers = data.reduce((sum, row) => sum + row.daily_active_users, 0);
+  // Sum of daily active users across all records
+  const totalDailyActiveUsers = data.reduce((sum, row) => sum + row.daily_active_users, 0);
   const averageAdoption = data.reduce((sum, row) => sum + row.adoption_rate, 0) / data.length;
   const uniqueCountries = new Set(data.map(row => row.country)).size;
   const uniqueIndustries = new Set(data.map(row => row.industry)).size;
@@ -185,11 +196,105 @@ export function calculateDashboardStats(data: AIAdoptionData[]): DashboardStats 
   const countryStats = aggregateByCountry(data);
 
   return {
-    totalUsers,
+    totalUsers: totalDailyActiveUsers,
     averageAdoption,
     totalCountries: uniqueCountries,
     totalIndustries: uniqueIndustries,
     topTool: toolStats[0]?.tool || 'N/A',
     topCountry: countryStats.sort((a, b) => b.totalUsers - a.totalUsers)[0]?.country || 'N/A',
   };
+}
+
+// New helper functions for working with precomputed data
+export function getCountryDataForYear(
+  precomputedData: PrecomputedData,
+  year: number | null
+): CountryData[] {
+  if (!year) {
+    return precomputedData.aggregations.byCountry;
+  }
+
+  // Filter raw data by year and recompute country aggregations
+  const filteredData = precomputedData.rawData.filter(item => item.year === year);
+  return aggregateByCountry(filteredData);
+}
+
+export function getIndustryDataForFilters(
+  precomputedData: PrecomputedData,
+  filters: { year?: number | null; country?: string | null }
+): IndustryData[] {
+  let filteredData = precomputedData.rawData;
+
+  if (filters.year) {
+    filteredData = filteredData.filter(item => item.year === filters.year);
+  }
+
+  if (filters.country) {
+    filteredData = filteredData.filter(item => item.country === filters.country);
+  }
+
+  return aggregateByIndustry(filteredData);
+}
+
+export function getToolDataForFilters(
+  precomputedData: PrecomputedData,
+  filters: { year?: number | null; country?: string | null }
+): ToolData[] {
+  let filteredData = precomputedData.rawData;
+
+  if (filters.year) {
+    filteredData = filteredData.filter(item => item.year === filters.year);
+  }
+
+  if (filters.country) {
+    filteredData = filteredData.filter(item => item.country === filters.country);
+  }
+
+  return aggregateByTool(filteredData);
+}
+
+export function getTrendDataForCountry(
+  precomputedData: PrecomputedData,
+  country: string | null
+): TrendData[] {
+  if (!country) {
+    return precomputedData.aggregations.byYear;
+  }
+
+  const filteredData = precomputedData.rawData.filter(item => item.country === country);
+  return aggregateByYear(filteredData);
+}
+
+export function getAgeGroupDataForFilters(
+  precomputedData: PrecomputedData,
+  filters: { year?: number | null; country?: string | null }
+): AgeGroupData[] {
+  let filteredData = precomputedData.rawData;
+
+  if (filters.year) {
+    filteredData = filteredData.filter(item => item.year === filters.year);
+  }
+
+  if (filters.country) {
+    filteredData = filteredData.filter(item => item.country === filters.country);
+  }
+
+  return aggregateByAgeGroup(filteredData);
+}
+
+export function getCompanySizeDataForFilters(
+  precomputedData: PrecomputedData,
+  filters: { year?: number | null; country?: string | null }
+): CompanySizeData[] {
+  let filteredData = precomputedData.rawData;
+
+  if (filters.year) {
+    filteredData = filteredData.filter(item => item.year === filters.year);
+  }
+
+  if (filters.country) {
+    filteredData = filteredData.filter(item => item.country === filters.country);
+  }
+
+  return aggregateByCompanySize(filteredData);
 }

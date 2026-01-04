@@ -66,10 +66,10 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
 
     const adoption = countryData.averageAdoption;
 
-    // Serika-inspired colors
-    if (adoption >= 70) return 'rgba(152, 195, 121, 0.9)'; // success green (70%+)
-    if (adoption >= 50) return 'rgba(229, 192, 123, 0.7)'; // accent yellow (50-69%)
-    if (adoption >= 30) return 'rgba(209, 154, 102, 0.9)'; // accent orange (30-49%)
+    // More distinct color scale for better visibility
+    if (adoption >= 70) return 'rgba(97, 175, 239, 0.9)'; // bright blue (70%+)
+    if (adoption >= 50) return 'rgba(152, 195, 121, 0.9)'; // success green (50-69%)
+    if (adoption >= 30) return 'rgba(229, 192, 123, 0.9)'; // accent yellow (30-49%)
     return 'rgba(224, 108, 117, 0.9)'; // error red (0-29%)
   }, [getCountryData, selectedCountry]);
 
@@ -122,7 +122,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
                   <span class="text-[#98c379] font-semibold">${countryData.averageAdoption.toFixed(1)}%</span>
                 </div>
                 <div class="flex justify-between text-xs">
-                  <span class="text-[#abb2bf]">Users:</span>
+                  <span class="text-[#abb2bf]">Daily Active Users:</span>
                   <span class="text-[#61afef] font-semibold">${countryData.totalUsers.toLocaleString()}</span>
                 </div>
               </div>
@@ -180,9 +180,9 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
         <h3 className="text-[#e5c07b] font-semibold text-sm mb-3">Adoption Rate</h3>
         <div className="space-y-2">
           {[
-            { color: '#98c379', label: '70%+' },
-            { color: '#e5c07b', label: '50-69%' },
-            { color: '#d19a66', label: '30-49%' },
+            { color: '#61afef', label: '70%+' },
+            { color: '#98c379', label: '50-69%' },
+            { color: '#e5c07b', label: '30-49%' },
             { color: '#e06c75', label: '0-29%' },
             { color: '#323437', label: 'No Data' },
           ].map(item => (

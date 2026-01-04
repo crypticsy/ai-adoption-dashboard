@@ -71,7 +71,7 @@ export function ToolsComparison({ data }: ToolsComparisonProps) {
               <span className="text-white font-medium">{tool.tool}</span>
             </div>
             <div className="text-right">
-              <div className="text-white font-semibold">{tool.totalUsers.toLocaleString()}</div>
+              <div className="text-white font-semibold">{tool.totalUsers.toLocaleString()} users</div>
               <div className="text-white/60 text-sm">{tool.averageAdoption.toFixed(1)}% adoption</div>
             </div>
           </motion.div>

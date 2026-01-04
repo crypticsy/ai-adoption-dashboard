@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import type { AIAdoptionData } from '../types';
-import { parseCSVData } from '../utils/dataParser';
+import type { PrecomputedData } from '../types';
 
 export function useDataLoader() {
-  const [data, setData] = useState<AIAdoptionData[]>([]);
+  const [precomputedData, setPrecomputedData] = useState<PrecomputedData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,8 +10,12 @@ export function useDataLoader() {
     async function loadData() {
       try {
         setLoading(true);
-        const csvData = await parseCSVData('/dataset/ai_adoption_dataset.csv');
-        setData(csvData);
+        const response = await fetch('/precomputed_data.json');
+        if (!response.ok) {
+          throw new Error(`Failed to load data: ${response.statusText}`);
+        }
+        const data: PrecomputedData = await response.json();
+        setPrecomputedData(data);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -25,5 +28,10 @@ export function useDataLoader() {
     loadData();
   }, []);
 
-  return { data, loading, error };
+  return {
+    data: precomputedData?.rawData || [],
+    precomputedData,
+    loading,
+    error
+  };
 }

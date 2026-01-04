@@ -11,7 +11,7 @@ export function DemographicsChart({ ageData, sizeData }: DemographicsChartProps)
   const radarData = ageData.map(item => ({
     ageGroup: item.ageGroup,
     adoption: item.averageAdoption,
-    users: item.totalUsers / 100000, // Scale down for visualization
+    dailyActiveUsers: item.totalUsers / 100000, // Scale down for visualization (in 100k)
   }));
 
   return (
@@ -22,7 +22,7 @@ export function DemographicsChart({ ageData, sizeData }: DemographicsChartProps)
       className="glass rounded-2xl p-6 h-full"
     >
       <h3 className="text-xl font-bold text-white mb-2">Demographics Analysis</h3>
-      <p className="text-white/60 text-sm mb-6">Age group adoption patterns</p>
+      <p className="text-white/60 text-sm mb-6">Age group adoption & daily active users</p>
 
       <ResponsiveContainer width="100%" height={300}>
         <RadarChart data={radarData}>
@@ -36,13 +36,26 @@ export function DemographicsChart({ ageData, sizeData }: DemographicsChartProps)
               borderRadius: '8px',
               color: '#fff',
             }}
+            formatter={(value: any, name: string) => {
+              if (name === 'Daily Active Users (100k)') {
+                return [(value * 100000).toLocaleString(), name];
+              }
+              return [value, name];
+            }}
           />
           <Radar
-            name="Adoption Rate"
+            name="Adoption Rate (%)"
             dataKey="adoption"
             stroke="#8b5cf6"
             fill="#8b5cf6"
             fillOpacity={0.6}
+          />
+          <Radar
+            name="Daily Active Users (100k)"
+            dataKey="dailyActiveUsers"
+            stroke="#61afef"
+            fill="#61afef"
+            fillOpacity={0.3}
           />
         </RadarChart>
       </ResponsiveContainer>

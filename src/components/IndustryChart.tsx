@@ -9,9 +9,12 @@ interface IndustryChartProps {
 const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#f97316'];
 
 export function IndustryChart({ data }: IndustryChartProps) {
+  // Calculate total users across all industries
+  const totalUsers = data.reduce((sum, item) => sum + item.totalUsers, 0);
+
   const chartData = data.map(item => ({
     name: item.industry,
-    users: item.totalUsers,
+    users: totalUsers > 0 ? (item.totalUsers / totalUsers) * 100 : 0, // Percentage of total
     adoption: item.averageAdoption,
   }));
 
@@ -37,7 +40,7 @@ export function IndustryChart({ data }: IndustryChartProps) {
           <YAxis
             stroke="#94a3b8"
             tick={{ fill: '#94a3b8' }}
-            label={{ value: 'Total Users', angle: -90, position: 'insideLeft', fill: '#94a3b8' }}
+            label={{ value: 'Users (% of Total)', angle: -90, position: 'insideLeft', fill: '#94a3b8' }}
           />
           <Tooltip
             contentStyle={{
@@ -47,7 +50,7 @@ export function IndustryChart({ data }: IndustryChartProps) {
               color: '#fff',
             }}
             formatter={(value: number, name: string) => {
-              if (name === 'users') return [value.toLocaleString(), 'Users'];
+              if (name === 'users') return [`${value.toFixed(2)}%`, 'Users % of Total'];
               if (name === 'adoption') return [`${value.toFixed(1)}%`, 'Adoption'];
               return [value, name];
             }}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useDataLoader } from './hooks/useDataLoader';
-import { aggregateByCountry } from './utils/dataParser';
+import { getCountryDataForYear } from './utils/dataParser';
 import { GlobeVisualization } from './components/GlobeVisualization';
 import { YearFilter } from './components/YearFilter';
 import { CountryDetailPanel } from './components/CountryDetailPanel';
@@ -8,7 +8,7 @@ import type { CountryData } from './types';
 import { motion } from 'framer-motion';
 
 function App() {
-  const { data, loading, error } = useDataLoader();
+  const { data, precomputedData, loading, error } = useDataLoader();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
 
@@ -17,8 +17,19 @@ function App() {
     return data.filter(item => item.year === selectedYear);
   }, [data, selectedYear]);
 
-  const countryData = useMemo(() => aggregateByCountry(filteredData), [filteredData]);
-  const availableYears = useMemo(() => [...new Set(data.map(d => d.year))].sort(), [data]);
+  const countryData = useMemo(() => {
+    if (!precomputedData) return [];
+    return getCountryDataForYear(precomputedData, selectedYear);
+  }, [precomputedData, selectedYear]);
+
+  const availableYears = useMemo(() => {
+    return precomputedData?.availableYears || [];
+  }, [precomputedData]);
+
+  // Calculate total count of daily active users
+  const totalActiveUsers = useMemo(() => {
+    return filteredData.reduce((sum, item) => sum + item.daily_active_users, 0);
+  }, [filteredData]);
 
   if (loading) {
     return (
@@ -93,17 +104,30 @@ function App() {
         />
       )}
 
-      {/* Branding */}
+      {/* Stats and Attribution */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-        className="fixed bottom-4 right-4 z-20 text-right pointer-events-none"
+        className="fixed bottom-4 right-4 z-20 text-right"
       >
-        <p className="text-[#5c6370] text-xs">
-          {filteredData.length.toLocaleString()} data points
-          {selectedYear && ` • ${selectedYear}`}
-        </p>
+        <div className="pointer-events-none space-y-1">
+          <p className="text-[#5c6370] text-xs">
+            {filteredData.length.toLocaleString()} data points
+            {selectedYear && ` • ${selectedYear}`}
+          </p>
+          <p className="text-[#5c6370] text-xs">
+            Dataset:{' '}
+            <a
+              href="https://www.kaggle.com/datasets/tfisthis/global-ai-tool-adoption-across-industries/data"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#61afef] hover:text-[#98c379] underline pointer-events-auto"
+            >
+              Global AI Tool Adoption Across Industries
+            </a>
+          </p>
+        </div>
       </motion.div>
     </div>
   );

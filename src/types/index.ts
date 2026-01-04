@@ -59,3 +59,22 @@ export interface DashboardStats {
   topTool: string;
   topCountry: string;
 }
+
+export interface PrecomputedData {
+  rawData: AIAdoptionData[];
+  aggregations: {
+    byCountry: CountryData[];
+    byIndustry: IndustryData[];
+    byTool: ToolData[];
+    byYear: TrendData[];
+    byAgeGroup: AgeGroupData[];
+    byCompanySize: CompanySizeData[];
+  };
+  dashboardStats: DashboardStats;
+  availableYears: number[];
+  metadata: {
+    totalRecords: number;
+    generatedAt: string;
+    version: string;
+  };
+}
