@@ -1,21 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useDataLoader } from './hooks/useDataLoader';
 import { getCountryDataForYear } from './utils/dataParser';
 import { GlobeVisualization } from './components/GlobeVisualization';
 import { YearFilter } from './components/YearFilter';
 import { CountryDetailPanel } from './components/CountryDetailPanel';
 import type { CountryData } from './types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const { data, precomputedData, loading, error } = useDataLoader();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
-
-  const filteredData = useMemo(() => {
-    if (!selectedYear) return data;
-    return data.filter(item => item.year === selectedYear);
-  }, [data, selectedYear]);
+  const [yearLoading, setYearLoading] = useState(false);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const countryData = useMemo(() => {
     if (!precomputedData) return [];
@@ -25,6 +22,37 @@ function App() {
   const availableYears = useMemo(() => {
     return precomputedData?.availableYears || [];
   }, [precomputedData]);
+
+  // Handle year change with loading animation
+  const handleYearChange = (year: number | null) => {
+    // Clear any existing timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+
+    // Set loading state first and let it render
+    setYearLoading(true);
+
+    // Defer the year update to allow loading animation to show
+    setTimeout(() => {
+      setSelectedYear(year);
+
+      // Hide loading after data has been processed
+      loadingTimeoutRef.current = setTimeout(() => {
+        setYearLoading(false);
+        loadingTimeoutRef.current = null;
+      }, 500);
+    }, 50); // Small delay to ensure loading overlay renders first
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -79,8 +107,43 @@ function App() {
       <YearFilter
         years={availableYears}
         selectedYear={selectedYear}
-        onYearChange={setSelectedYear}
+        onYearChange={handleYearChange}
       />
+
+      {/* Year Change Loading Overlay */}
+      <AnimatePresence>
+        {yearLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#0d0d0d]/80 backdrop-blur-sm pointer-events-none"
+          >
+            <div className="text-center">
+              <motion.div
+                animate={{
+                  rotate: 360,
+                }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+                className="w-12 h-12 border-4 border-[#323437] border-t-[#e5c07b] rounded-full mx-auto mb-3"
+              />
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-[#abb2bf] text-sm"
+              >
+                Updating data...
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Full-screen Globe */}
       <GlobeVisualization
