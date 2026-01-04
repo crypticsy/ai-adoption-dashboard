@@ -44,10 +44,20 @@ export function ToolsComparison({ data }: ToolsComparisonProps) {
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
+              backgroundColor: 'rgba(15, 23, 42, 0.98)',
+              border: '1px solid rgba(148, 163, 184, 0.3)',
               borderRadius: '8px',
-              color: '#fff',
+              padding: '12px',
+            }}
+            itemStyle={{
+              color: '#ffffff',
+            }}
+            labelStyle={{
+              color: '#e5c07b',
+              fontWeight: '600',
+            }}
+            wrapperStyle={{
+              outline: 'none',
             }}
             formatter={(value: number) => value.toLocaleString()}
           />

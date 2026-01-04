@@ -59,11 +59,22 @@ export function TrendChart({ data }: TrendChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgba(15, 23, 42, 0.95)',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
+              backgroundColor: 'rgba(15, 23, 42, 0.98)',
+              border: '1px solid rgba(148, 163, 184, 0.3)',
               borderRadius: '8px',
-              color: '#fff',
+              padding: '12px',
             }}
+            itemStyle={{
+              color: '#ffffff',
+            }}
+            labelStyle={{
+              color: '#e5c07b',
+              fontWeight: '600',
+            }}
+            wrapperStyle={{
+              outline: 'none',
+            }}
+            cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
             formatter={(value: number, name: string) => {
               if (name === 'adoption') return [`${value.toFixed(1)}%`, 'Adoption Rate'];
               if (name === 'users') return [`${value.toFixed(2)}%`, 'Users % of Total'];

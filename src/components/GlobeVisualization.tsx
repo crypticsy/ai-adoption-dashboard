@@ -32,7 +32,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
       globe.controls().minDistance = 150;
       globe.controls().maxDistance = 400;
 
-      // Point camera at selected country
+      // Point camera at selected country only when selecting (not when deselecting)
       if (selectedCountry) {
         globe.pointOfView(
           {
@@ -42,10 +42,8 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
           },
           1000
         );
-      } else {
-        // Reset to default view
-        globe.pointOfView({ lat: 0, lng: 0, altitude: 2.5 }, 1000);
       }
+      // When deselecting, don't move the camera - stay at current position
     }
   }, [selectedCountry]);
 
@@ -58,10 +56,10 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
     const countryData = getCountryData(country);
     if (!countryData) return 'rgba(50, 52, 55, 0.4)'; // Serika dark grey for no data
 
-    // Highlight selected country with bright gold
+    // Highlight selected country with vibrant orange/gold
     const countryName = country.properties.NAME || country.properties.ADMIN;
     if (selectedCountry && countryName === selectedCountry.country) {
-      return 'rgba(229, 192, 123, 1)'; // Bright gold for selected
+      return 'rgba(255, 255, 255, 1)'; // Vibrant white for selected (more distinct)
     }
 
     const adoption = countryData.averageAdoption;
@@ -84,7 +82,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
     }
 
     // Scale altitude based on adoption rate (0.01 to 0.05)
-    return (countryData.averageAdoption / 100) * 0.04 + 0.01;
+    return (countryData.averageAdoption / 100) * 0.01 + 0.01;
   }, [getCountryData, selectedCountry]);
 
   const handleCountryClick = useCallback((country: any) => {
@@ -114,16 +112,16 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
           if (!countryData) return '';
 
           return `
-            <div class="glass p-3 rounded-lg min-w-[200px]">
-              <div class="font-bold text-[#e5c07b] text-base mb-2">${countryData.country}</div>
-              <div class="space-y-1">
-                <div class="flex justify-between text-xs">
-                  <span class="text-[#abb2bf]">Adoption:</span>
-                  <span class="text-[#98c379] font-semibold">${countryData.averageAdoption.toFixed(1)}%</span>
+            <div style="background: rgba(26, 26, 26, 0.95); border: 1px solid rgba(50, 52, 55, 0.8); border-radius: 8px; padding: 12px; min-width: 200px; backdrop-filter: blur(8px);">
+              <div style="font-weight: bold; color: #e5c07b; font-size: 16px; margin-bottom: 8px;">${countryData.country}</div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span style="color: #abb2bf;">Adoption:</span>
+                  <span style="color: #98c379; font-weight: 600;">${countryData.averageAdoption.toFixed(1)}%</span>
                 </div>
-                <div class="flex justify-between text-xs">
-                  <span class="text-[#abb2bf]">Daily Active Users:</span>
-                  <span class="text-[#61afef] font-semibold">${countryData.totalUsers.toLocaleString()}</span>
+                <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                  <span style="color: #abb2bf;">Daily Active Users:</span>
+                  <span style="color: #61afef; font-weight: 600;">${countryData.totalUsers.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -137,13 +135,14 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
         atmosphereColor="rgba(229, 192, 123, 0.3)"
         atmosphereAltitude={0.15}
 
-        // Globe appearance
+        // Globe appearance - solid and opaque
         globeMaterial={{
-          color: '#1a1a1a',
-          emissive: '#1a1a1a',
-          emissiveIntensity: 0.2,
-          shininess: 0.3,
+          color: '#0d0d0d',
+          emissive: '#0d0d0d',
+          emissiveIntensity: 0.3,
+          shininess: 0.2,
           opacity: 1,
+          transparent: false,
         }}
 
         // Animation
