@@ -93,7 +93,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
   }, [getCountryData, onCountrySelect, selectedCountry]);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#0d0d0d]">
+    <div className="fixed inset-0 w-full h-full bg-[#0d0d0d] globe-container">
       {/* Globe */}
       <Globe
         ref={globeEl}
@@ -120,7 +120,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
                   <span style="color: #98c379; font-weight: 600;">${countryData.averageAdoption.toFixed(1)}%</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 12px;">
-                  <span style="color: #abb2bf;">Daily Active Users:</span>
+                  <span style="color: #abb2bf;">Avg. Daily Active Users:</span>
                   <span style="color: #61afef; font-weight: 600;">${countryData.totalUsers.toLocaleString()}</span>
                 </div>
               </div>
@@ -158,11 +158,12 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
             animate={{ opacity: 1, y: 0 , x: '-50%'}}
             exit={{ opacity: 0, y: -20 , x: '-50%'}}
             transition={{ delay: 1 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+            className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none px-4"
           >
-            <div className="bg-[#1a1a1a] border border-[#323437] px-6 py-3 rounded-lg">
-              <p className="text-[#abb2bf] text-xs">
-                Click on a country to view detailed analytics
+            <div className="bg-[#1a1a1a] border border-[#323437] px-9 sm:px-4 py-2 sm:py-3 rounded-lg">
+              <p className="text-[#abb2bf] text-xs text-center">
+                <span className="hidden sm:inline">Click on a country to view detailed analytics</span>
+                <span className="sm:hidden">Tap a country for details</span>
               </p>
             </div>
           </motion.div>
@@ -174,10 +175,10 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 1.5 }}
-        className="fixed bottom-8 left-8 z-30 glass p-4 rounded-lg"
+        className="fixed bottom-4 sm:bottom-12 left-3 sm:left-8 z-30 glass p-3 sm:p-4 rounded-lg text-xs sm:text-sm"
       >
-        <h3 className="text-[#e5c07b] font-semibold text-sm mb-3">Adoption Rate</h3>
-        <div className="space-y-2">
+        <h3 className="text-[#e5c07b] font-semibold text-xs sm:text-sm mb-2 sm:mb-3">Adoption Rate</h3>
+        <div className="space-y-1.5 sm:space-y-2">
           {[
             { color: '#61afef', label: '70%+' },
             { color: '#98c379', label: '50-69%' },
@@ -185,9 +186,9 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
             { color: '#e06c75', label: '0-29%' },
             { color: '#323437', label: 'No Data' },
           ].map(item => (
-            <div key={item.label} className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color, opacity: 0.9 }} />
-              <span className="text-[#abb2bf] text-xs">{item.label}</span>
+            <div key={item.label} className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded flex-shrink-0" style={{ backgroundColor: item.color, opacity: 0.9 }} />
+              <span className="text-[#abb2bf] text-xs whitespace-nowrap">{item.label}</span>
             </div>
           ))}
         </div>

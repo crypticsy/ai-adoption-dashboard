@@ -74,24 +74,27 @@ body {
 }
 
 /* Globe.gl tooltip overrides - remove default black background */
-.scene-tooltip,
-.scene-tooltip *,
-[class*="tooltip"],
-.globe-tooltip,
-canvas + div[style*="position: absolute"] {
+/* Aggressively target all tooltip elements within globe container */
+
+/* Target the tooltip wrapper that globe.gl creates */
+.globe-container > div > div[style*="position"] {
   background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Target any absolutely positioned div within globe that's not our custom elements */
+.globe-container div[style*="position: absolute"]:not(.glass):not([class*="motion"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Scene tooltip class if it exists */
+.globe-container .scene-tooltip,
+.globe-container [class*="tooltip"] {
+  background: transparent !important;
+  background-color: transparent !important;
   box-shadow: none !important;
   padding: 0 !important;
   border: none !important;
-}
-
-/* Target the tooltip container specifically */
-.scene-container [style*="pointer-events"] {
-  background: transparent !important;
-}
-
-/* Override any inline styles on tooltip wrappers */
-div[style*="position: absolute"][style*="pointer-events"] {
-  background: transparent !important;
-  box-shadow: none !important;
 }

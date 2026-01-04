@@ -132,29 +132,29 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
         className="fixed right-0 top-0 bottom-0 w-full md:w-[500px] lg:w-[600px] bg-[#1a1a1a]/98 backdrop-blur-xl border-l border-[#323437] z-50 overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-[#1a1a1a]/98 backdrop-blur-xl border-b border-[#323437] p-6 z-10">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-[#e5c07b] mb-2">{country.country}</h2>
-              <p className="text-[#abb2bf]">
-                {selectedYear ? `Data for ${selectedYear}` : 'All available data'} • {countryData.length.toLocaleString()} records
+        <div className="sticky top-0 bg-[#1a1a1a]/98 backdrop-blur-xl border-b border-[#323437] p-4 sm:p-6 z-10">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#e5c07b] mb-1 sm:mb-2 truncate">{country.country}</h2>
+              <p className="text-[#abb2bf] text-xs sm:text-sm">
+                {selectedYear ? `Data for ${selectedYear}` : 'All data'} • {countryData.length.toLocaleString()} records
               </p>
             </div>
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="bg-[#323437] hover:bg-[#e5c07b] hover:text-[#1a1a1a] text-[#abb2bf] p-2 rounded-lg transition-colors"
+              className="bg-[#323437] hover:bg-[#e5c07b] hover:text-[#1a1a1a] text-[#abb2bf] p-2 rounded-lg transition-colors flex-shrink-0"
             >
-              <X size={24} />
+              <X size={20} className="sm:w-6 sm:h-6" />
             </motion.button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Key Stats */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

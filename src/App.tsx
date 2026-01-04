@@ -167,35 +167,36 @@ function App() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-        className="fixed bottom-4 right-4 z-20 text-right"
+        className="fixed bottom-2 sm:bottom-10 right-2 sm:right-4 z-20 text-right max-w-[calc(100vw-1rem)] sm:max-w-none"
       >
-        <div className="pointer-events-none space-y-3">
-          <p className="text-[#5c6370] text-xs">
-            Created by {' '}
+        <div className="pointer-events-none space-y-2 sm:space-y-3">
+          <p className="text-[#5c6370] text-[10px] sm:text-xs">
+            <span className="hidden sm:inline">Created by </span>
             <a
               href="https://www.animeshbasnet.com.np/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-amber-200 pointer-events-auto inline-flex items-center gap-2 transition-colors"
+              className="text-slate-400 hover:text-amber-200 pointer-events-auto inline-flex items-center gap-1 sm:gap-2 transition-colors"
             >
               Crypticsy
               <img
                 src="https://github.com/crypticsy.png"
                 alt="Crypticsy GitHub Profile"
-                className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-black/20 hover:border-black/40 transition-colors"
+                className="w-4 h-4 sm:w-6 sm:h-6 rounded-full border-2 border-black/20 hover:border-black/40 transition-colors"
               />
             </a>
           </p>
 
-          <p className="text-[#5c6370] text-xs">
-            Dataset:{' '}
+          <p className="text-[#5c6370] text-[10px] sm:text-xs leading-tight">
+            <span className="hidden sm:inline">Dataset: </span>
             <a
               href="https://www.kaggle.com/datasets/tfisthis/global-ai-tool-adoption-across-industries/data"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#5c6370] hover:text-amber-200 underline pointer-events-auto"
+              className="text-[#5c6370] hover:text-amber-200 underline pointer-events-auto break-words"
             >
-              Global AI Tool Adoption Across Industries
+              <span className="hidden sm:inline">Global AI Tool Adoption Across Industries</span>
+              <span className="sm:hidden">Kaggle Dataset</span>
             </a>
           </p>
         </div>
