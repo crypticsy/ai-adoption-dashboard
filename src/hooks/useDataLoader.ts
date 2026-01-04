@@ -10,7 +10,7 @@ export function useDataLoader() {
     async function loadData() {
       try {
         setLoading(true);
-        const response = await fetch('/precomputed_data.json');
+        const response = await fetch(`${import.meta.env.BASE_URL}precomputed_data.json`);
         if (!response.ok) {
           throw new Error(`Failed to load data: ${response.statusText}`);
         }
