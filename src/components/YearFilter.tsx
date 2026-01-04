@@ -18,9 +18,9 @@ export function YearFilter({ years, selectedYear, onYearChange }: YearFilterProp
   className="fixed top-6 left-1/2 z-40 pointer-events-none"
     >
       <div className="flex items-center justify-center gap-3 bg-[#1a1a1a]/90 border border-[#323437] rounded-lg px-6 py-3 shadow-2xl pointer-events-auto backdrop-blur-sm">
-        <Calendar className="text-[#e5c07b]" size={18} />
-        <span className="text-[#abb2bf] font-medium text-sm">Select Year:</span>
+        <span className="text-[#abb2bf] font-medium text-sm">Global AI Adoption | </span>
 
+        <Calendar className="text-[#e5c07b]" size={18} />
         <div className="flex items-center gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -32,7 +32,7 @@ export function YearFilter({ years, selectedYear, onYearChange }: YearFilterProp
                 : 'text-[#abb2bf] hover:bg-[#323437]'
             }`}
           >
-            All Years
+            All
           </motion.button>
 
           {years.map((year) => (

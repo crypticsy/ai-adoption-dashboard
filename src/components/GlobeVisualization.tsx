@@ -161,7 +161,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
           >
             <div className="bg-[#1a1a1a] border border-[#323437] px-6 py-3 rounded-lg">
-              <p className="text-[#abb2bf] text-sm">
+              <p className="text-[#abb2bf] text-xs">
                 Click on a country to view detailed analytics
               </p>
             </div>
