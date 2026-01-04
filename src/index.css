@@ -72,3 +72,26 @@ body {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Globe.gl tooltip overrides - remove default black background */
+.scene-tooltip,
+.scene-tooltip *,
+[class*="tooltip"],
+.globe-tooltip,
+canvas + div[style*="position: absolute"] {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Target the tooltip container specifically */
+.scene-container [style*="pointer-events"] {
+  background: transparent !important;
+}
+
+/* Override any inline styles on tooltip wrappers */
+div[style*="position: absolute"][style*="pointer-events"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}

@@ -112,7 +112,7 @@ export function GlobeVisualization({ data, onCountrySelect, selectedCountry }: G
           if (!countryData) return '';
 
           return `
-            <div style="background: rgba(26, 26, 26, 0.95); border: 1px solid rgba(50, 52, 55, 0.8); border-radius: 8px; padding: 12px; min-width: 200px; backdrop-filter: blur(8px);">
+            <div style="background: rgba(26, 26, 26, 0.95) !important; border: 1px solid rgba(50, 52, 55, 0.8); border-radius: 8px; padding: 12px; min-width: 200px; backdrop-filter: blur(8px); box-shadow: none !important;">
               <div style="font-weight: bold; color: #e5c07b; font-size: 16px; margin-bottom: 8px;">${countryData.country}</div>
               <div style="display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; justify-content: space-between; font-size: 12px;">
