@@ -122,6 +122,20 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
     ? countryData.reduce((sum, d) => sum + d.adoption_rate, 0) / countryData.length
     : 0;
 
+  // Calculate domains with 10% padding for charts
+  const calculateDomain = (values: number[]) => {
+    if (values.length === 0) return [0, 100];
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min;
+    const padding = range * 0.1;
+    return [min - padding, max + padding];
+  };
+
+  const trendDomain = calculateDomain(trendData.map(d => parseFloat(d.adoption)));
+  const industryDomain = calculateDomain(industryData.map(d => d.usersPercent));
+  const ageDomain = calculateDomain(ageData.map(d => d.usersPercent));
+
   return (
     <AnimatePresence>
       <motion.div
@@ -232,7 +246,7 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                 <LineChart data={trendData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#323437" />
                   <XAxis dataKey="year" stroke="#abb2bf" tick={{ fill: '#abb2bf' }} />
-                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} />
+                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} domain={trendDomain} tickFormatter={(value) => `${value.toFixed(0)}%`} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1a1a1a',
@@ -263,13 +277,20 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                 <BarChart data={industryData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#323437" />
                   <XAxis dataKey="name" stroke="#abb2bf" tick={{ fill: '#abb2bf', fontSize: 11 }} angle={-45} textAnchor="end" height={80} />
-                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users (% of Total)', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} />
+                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users %', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} domain={industryDomain} tickFormatter={(value) => `${value.toFixed(0)}%`} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1a1a1a',
                       border: '1px solid #323437',
                       borderRadius: '8px',
                       color: '#abb2bf',
+                    }}
+                    itemStyle={{
+                      color: '#ffffff',
+                    }}
+                    labelStyle={{
+                      color: '#e5c07b',
+                      fontWeight: '600',
                     }}
                     formatter={(value: number, name: string) => {
                       if (name === 'usersPercent') return [`${value.toFixed(2)}%`, 'Users % of Total'];
@@ -320,6 +341,13 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                       border: '1px solid #323437',
                       borderRadius: '8px',
                       color: '#abb2bf',
+                    }}
+                    itemStyle={{
+                      color: '#ffffff',
+                    }}
+                    labelStyle={{
+                      color: '#e5c07b',
+                      fontWeight: '600',
                     }}
                   />
                 </RechartsPie>
@@ -378,7 +406,7 @@ export function CountryDetailPanel({ country, allData, selectedYear, onClose }: 
                 <BarChart data={ageData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#323437" />
                   <XAxis dataKey="name" stroke="#abb2bf" tick={{ fill: '#abb2bf' }} />
-                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users (% of Total)', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} />
+                  <YAxis stroke="#abb2bf" tick={{ fill: '#abb2bf' }} label={{ value: 'Users %', angle: -90, position: 'insideLeft', fill: '#abb2bf' }} domain={ageDomain} tickFormatter={(value) => `${value.toFixed(0)}%`} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1a1a1a',
